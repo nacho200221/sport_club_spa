@@ -21,6 +21,8 @@ import Register from "../pages/Register"
 
 import Profile from "../pages/Profile";
 
+import SportsPage from "../pages/admin/sportpage";
+
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -56,11 +58,18 @@ function AppRoutes() {
         }>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="/admin/sports" element={
+          <RoleRoute allowedRoles={["admin"]}>
+          <SportsPage />
+        </RoleRoute>
+} />
         </Route>
 
         <Route path="/register" element={<Register />} />
 
         <Route path="/profile" element={<Profile />} />
+
+        
       </Routes>
     </BrowserRouter>
   )
