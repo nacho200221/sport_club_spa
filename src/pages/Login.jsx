@@ -1,94 +1,86 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import "../index.css"; // Usa "../App.css" si guardaste los estilos ahí
-
-const users = [
-  { user: "usuario1@sportclub.cl", password: "123", role: "usuario", nombre: "Juan Pérez" },
-  { user: "usuario2@sportclub.cl", password: "123", role: "usuario", nombre: "María Gómez" },
-  { user: "coach1@sportclub.cl", password: "123", role: "coach", nombre: "Prof. Carlos Silva" },
-  { user: "coach2@sportclub.cl", password: "123", role: "coach", nombre: "Prof. Ana Rojas" },
-  { user: "admin1@sportclub.cl", password: "123", role: "admin", nombre: "Admin Principal" },
-  { user: "admin2@sportclub.cl", password: "123", role: "admin", nombre: "Admin Soporte" }
-];
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { Alert, Button, Card, Container, Form, Spinner } from "react-bootstrap"
+import { loginUser, saveSession } from "../services/authService"
 
 function Login() {
-  const [correo, setCorreo] = useState("");
-  const [password, setPassword] = useState("");
-  const [mensajeError, setMensajeError] = useState("");
+  const navigate = useNavigate()
   
-  const navigate = useNavigate();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setError("")
+    setLoading(true)
 
-    const usuarioEncontrado = users.find(u => u.user === correo && u.password === password);
-
-    if (usuarioEncontrado) {
-      setMensajeError("");
+    try {
+    
+      const data = await loginUser({ email, password })
       
-      localStorage.setItem("user", JSON.stringify(usuarioEncontrado));
+      
+      saveSession(data.data.token, data.data.user)
 
-      if (usuarioEncontrado.role === "usuario") {
-        navigate("/user/dashboard");
-      } else if (usuarioEncontrado.role === "coach") {
-        navigate("/coach/dashboard");
-      } else if (usuarioEncontrado.role === "admin") {
-        navigate("/admin/dashboard");
+      
+      if (data.data.user.role === "admin") {
+        navigate("/admin/dashboard")
+      } else if (data.data.user.role === "coach") {
+        navigate("/coach/dashboard")
+      } else {
+        navigate("/user/dashboard")
       }
-    } else {
-      setMensajeError("Credenciales incorrectas. Inténtalo de nuevo.");
+    } catch (error) {
+      setError(error.message)
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <main className="pantalla-centrada">
-      <div className="caja-formulario">
-        <h2>Iniciar Sesión</h2>
-        
-        <form onSubmit={handleSubmit} className="formulario">
-          <div className="grupo-input">
-            <label htmlFor="correo">Correo Electrónico</label>
-            <input 
-              type="email" 
-              id="correo" 
-              placeholder="ejemplo@correo.com" 
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              required 
-            />
-          </div>
+    <Container className="d-flex justify-content-center align-items-center vh-100">
+      <Card style={{ width: "24rem" }} className="shadow">
+        <Card.Body>
+          <Card.Title className="text-center mb-4">SportClub Login</Card.Title>
           
-          <div className="grupo-input">
-            <label htmlFor="password">Contraseña</label>
-            <input 
-              type="password" 
-              id="password" 
-              placeholder="********" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required 
-            />
-          </div>
+          {error && <Alert variant="danger">{error}</Alert>}
+          
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>Correo</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Ingrese su correo"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
 
-          {mensajeError && (
-            <p style={{ color: '#dc3545', fontSize: '0.9em', textAlign: 'center', marginBottom: '10px', fontWeight: 'bold' }}>
-              {mensajeError}
-            </p>
-          )}
+            <Form.Group className="mb-3">
+              <Form.Label>Contraseña</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Ingrese su contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Form.Group>
 
-          <button type="submit" className="boton-bloque" style={{ width: '100%', border: 'none', cursor: 'pointer' }}>
-            Ingresar
-          </button>
-        </form>
-
-        <div className="enlaces-extra">
-          <p><Link to="/recuperar">¿Olvidaste tu contraseña?</Link></p>
-          <br />
-          <p>¿No tienes cuenta? <Link to="/registro">Regístrate aquí</Link></p>
-        </div>
-      </div>
-    </main>
-  );
+            <Button type="submit" variant="primary" className="w-100" disabled={loading}>
+              {loading ? (
+                <>
+                  <Spinner size="sm" animation="border" className="me-2" /> Ingresando...
+                </>
+              ) : (
+                "Ingresar"
+              )}
+            </Button>
+          </Form>
+        </Card.Body>
+      </Card>
+    </Container>
+  )
 }
 
-export default Login;
+export default Login
