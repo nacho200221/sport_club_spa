@@ -17,7 +17,7 @@ import RoleRoute from "./RoleRoute"
 
 import UsersPage from "../pages/admin/UsersPage"
 
-import Register from "../pages/Register"
+import Register from "../pages/register"
 
 import Profile from "../pages/Profile";
 
