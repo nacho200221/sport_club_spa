@@ -1,42 +1,31 @@
-import { Link, Outlet, useNavigate } from "react-router-dom"
-import { Button, Container, Nav, Navbar } from "react-bootstrap"
-import { logout, getUser } from "../services/authService"
+import { Navbar, Nav, Container, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../services/authService';
 
-function UserLayout() {
-  const navigate = useNavigate()
-  const user = getUser()
-
-  const handleLogout = () => {
-    logout()
-    navigate("/login")
-  }
-
+export default function UserLayout({ children }) {
+  const navigate = useNavigate();
   return (
-    <>
-      <Navbar bg="primary" variant="dark" expand="lg">
+    <div className="bg-light min-vh-100">
+      <Navbar style={{ backgroundColor: '#1565c0' }} variant="dark" expand="lg" className="shadow-sm">
         <Container>
-          <Navbar.Brand>SportClub Usuario</Navbar.Brand>
-          
-          <Nav className="me-auto">
-            <Link className="nav-link" to="/user/dashboard">Dashboard</Link>
-            <Link className="nav-link" to="/profile">Mi Perfil</Link>
-          </Nav>
-          
-          <span className="text-white me-3">
-            Hola, {user?.name || user?.nombre}
-          </span>
-          
-          <Button variant="outline-light" onClick={handleLogout}>
-            Cerrar sesión
-          </Button>
+          <Navbar.Brand href="/user/classes" className="fw-bold">
+            <i className="bi bi-person me-2"></i>SportClub | Usuario
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              <Nav.Link href="/user/classes">Clases Disponibles</Nav.Link>
+              <Nav.Link href="/user/reservations">Mis Reservas</Nav.Link>
+            </Nav>
+            <Nav>
+              <Button variant="outline-light" size="sm" onClick={() => { logout(); navigate('/login'); }}>
+                <i className="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
+              </Button>
+            </Nav>
+          </Navbar.Collapse>
         </Container>
       </Navbar>
-
-      <Container className="mt-4">
-        <Outlet />
-      </Container>
-    </>
-  )
+      <Container className="mt-4">{children}</Container>
+    </div>
+  );
 }
-
-export default UserLayout

@@ -21,6 +21,19 @@ import Register from "../pages/Register"
 
 import Profile from "../pages/Profile";
 
+import RoomsPage from "../pages/admin/RoomsPage";
+
+import AssignmentsPage from "../pages/admin/AssignmentsPage";
+
+import SchedulesPage from "../pages/admin/SchedulesPage";
+
+import MyClassesPage from "../pages/coach/MyClassesPage";
+
+import MySchedulesPage from "../pages/coach/MySchedulesPage";
+
+import AvailableClassesPage from "../pages/user/AvailableClassesPage";
+
+import MyReservationsPage from "../pages/user/MyReservationsPage";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -61,6 +74,20 @@ function AppRoutes() {
         <Route path="/register" element={<Register />} />
 
         <Route path="/profile" element={<Profile />} />
+
+        <Route path="/admin/rooms" element={<RoomsPage />} />
+
+        <Route path="/admin/assignments" element={<AdminLayout><AssignmentsPage /></AdminLayout>} />
+
+        <Route path="/admin/schedules" element={<AdminLayout><SchedulesPage /></AdminLayout>} />
+        
+        <Route path="/coach/classes" element={<CoachLayout><MyClassesPage /></CoachLayout>} />
+
+        <Route path="/coach/schedules" element={<CoachLayout><MySchedulesPage /></CoachLayout>} />
+
+        <Route path="/user/classes" element={<UserLayout><AvailableClassesPage /></UserLayout>} />
+
+        <Route path="/user/reservations" element={<UserLayout><MyReservationsPage /></UserLayout>} />
       </Routes>
     </BrowserRouter>
   )
