@@ -21,11 +21,11 @@ import Register from "../pages/register"
 
 import Profile from "../pages/profile";
 
-import RoomsPage from "../pages/admin/RoomsPage";
+import RoomsPage from "../pages/admin/roomsPage";
 
-import AssignmentsPage from "../pages/admin/AssignmentsPage";
+import AssignmentsPage from "../pages/admin/assignmentsPage";
 
-import SchedulesPage from "../pages/admin/SchedulesPage";
+import SchedulesPage from "../pages/admin/schedulesPage";
 
 import MyClassesPage from "../pages/coach/MyClassesPage";
 
