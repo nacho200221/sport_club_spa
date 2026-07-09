@@ -19,7 +19,7 @@ import UsersPage from "../pages/admin/UsersPage"
 
 import Register from "../pages/register"
 
-import Profile from "../pages/Profile";
+import Profile from "../pages/profile";
 
 import RoomsPage from "../pages/admin/RoomsPage";
 
