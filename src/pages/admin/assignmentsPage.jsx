@@ -130,25 +130,33 @@ export default function AssignmentsPage() {
           <thead className="bg-light">
             <tr>
               <th className="text-muted border-0">ID ASIGNACIÓN</th>
-              <th className="text-muted border-0">DEPORTE (ID)</th>
-              <th className="text-muted border-0">SALA (ID)</th>
-              <th className="text-muted border-0">COACH (ID)</th>
+              {/* Le quitamos el (ID) a los títulos */}
+              <th className="text-muted border-0">DEPORTE</th>
+              <th className="text-muted border-0">SALA</th>
+              <th className="text-muted border-0">COACH</th>
               <th className="text-muted border-0">ACCIONES</th>
             </tr>
           </thead>
           <tbody>
-            {assignments.map(a => (
-              <tr key={a.id}>
-                <td className="fw-bold">{a.id}</td>
-                <td>{a.sport_id}</td>
-                <td>{a.room_id}</td>
-                <td>{a.coach_id}</td>
-                <td>
-                  <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleShow(a)}>Editar</Button>
-                  <Button variant="outline-danger" size="sm" onClick={() => handleDelete(a.id)}>Eliminar</Button>
-                </td>
-              </tr>
-            ))}
+            {assignments.map(a => {
+              // Buscamos los nombres cruzando el ID con las listas que ya tienes
+              const sportName = sports.find(s => s.id === a.sport_id)?.name || a.sport_id;
+              const roomName = rooms.find(r => r.id === a.room_id)?.name || a.room_id;
+              const coachName = coaches.find(c => c.id === a.coach_id)?.full_name || a.coach_id;
+
+              return (
+                <tr key={a.id}>
+                  <td className="fw-bold">{a.id}</td>
+                  <td>{sportName}</td>
+                  <td>{roomName}</td>
+                  <td>{coachName}</td>
+                  <td>
+                    <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleShow(a)}>Editar</Button>
+                    <Button variant="outline-danger" size="sm" onClick={() => handleDelete(a.id)}>Eliminar</Button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       </Card>

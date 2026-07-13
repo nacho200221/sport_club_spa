@@ -1,6 +1,7 @@
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../services/authService';
+import { Outlet, Link } from 'react-router-dom';
 
 export default function AdminLayout({ children }) {
   const navigate = useNavigate();
@@ -14,16 +15,16 @@ export default function AdminLayout({ children }) {
     <div className="bg-light min-vh-100">
       <Navbar style={{ backgroundColor: '#7b1fa2' }} variant="dark" expand="lg" className="shadow-sm">
         <Container>
-          <Navbar.Brand href="/admin/rooms" className="fw-bold">
-            <i className="bi bi-diagram-3-fill me-2"></i>SportClub | Admin
+          <Navbar.Brand as={Link} to="/admin/dashboard" className="fw-bold" style={{ cursor: 'pointer' }}>
+            <i className="bi bi-shield-lock me-2"></i>SportClub | Admin
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              {/* Aquí están los enlaces a tus flujos */}
-              <Nav.Link href="/admin/rooms">Salas</Nav.Link>
-              <Nav.Link href="/admin/assignments">Asignaciones</Nav.Link>
-              <Nav.Link href="/admin/schedules">Horarios</Nav.Link>
+              <Nav.Link as={Link} to="/admin/profile" className="text-white border border-light rounded px-3 py-1 mx-1">Mi Perfil</Nav.Link>
+              <Nav.Link as={Link} to="/admin/rooms" className="text-white border border-light rounded px-3 py-1 mx-1">Salas</Nav.Link>
+              <Nav.Link as={Link} to="/admin/assignments" className="text-white border border-light rounded px-3 py-1 mx-1">Asignaciones</Nav.Link>
+              <Nav.Link as={Link} to="/admin/schedules" className="text-white border border-light rounded px-3 py-1 mx-1">Horarios</Nav.Link>
             </Nav>
             <Nav>
               <Button variant="outline-light" size="sm" onClick={handleLogout}>
@@ -34,7 +35,7 @@ export default function AdminLayout({ children }) {
         </Container>
       </Navbar>
       <Container className="mt-4">
-        {children}
+        {children}<Outlet />
       </Container>
     </div>
   );

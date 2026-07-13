@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Table, Button, Form, Modal, Card, Row, Col } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { getRooms, createRoom, updateRoom, deleteRoom } from '../../services/roomService';
-// Importa tu Layout morado aquí si lo tienes separado
+
 
 export default function RoomsPage() {
   const [rooms, setRooms] = useState([]);
@@ -15,7 +15,6 @@ export default function RoomsPage() {
   const fetchRooms = async () => {
     try {
       const data = await getRooms();
-      // LA CORRECCIÓN ESTÁ EN ESTA LÍNEA:
       setRooms(data.data || data); 
     } catch (error) {
       Swal.fire('Error', 'No se pudieron cargar las salas', 'error');
@@ -47,7 +46,7 @@ export default function RoomsPage() {
         await createRoom(formData);
         Swal.fire('¡Creado!', 'La sala ha sido registrada.', 'success');
       }
-      fetchRooms(); // Actualización automática
+      fetchRooms(); 
       handleClose();
     } catch (error) {
       Swal.fire('Error', 'Ocurrió un problema al guardar', 'error');
@@ -75,7 +74,6 @@ export default function RoomsPage() {
     }
   };
 
-  // Contadores para tus tarjetas
   const totalRooms = rooms.length;
   const totalCapacity = rooms.reduce((acc, room) => acc + (parseInt(room.capacity) || 0), 0);
 
@@ -83,11 +81,11 @@ export default function RoomsPage() {
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 style={{ color: '#4a148c', fontWeight: 'bold' }}>Gestión de Salas</h2>
+          <h2 style={{ color: '#4a148c', fontWeight: 'bold' }}>Salas</h2>
           <p className="text-muted">Instalaciones disponibles en el gimnasio</p>
         </div>
         <Button variant="primary" style={{ backgroundColor: '#7b1fa2', borderColor: '#7b1fa2' }} onClick={() => handleShow()}>
-          + Agregar Sala
+           + Agregar Sala
         </Button>
       </div>
 

@@ -49,8 +49,11 @@ export default function MySchedulesPage() {
           </thead>
           <tbody>
             {schedules.map(s => {
+              // Escudo: Extraemos los datos cruzados
+              const sportName = s.sportRoom?.sport?.name || s.sport_name || 'Clase';
+              const roomName = s.sportRoom?.room?.name || s.room_name || 'Sala';
+              const capacity = s.sportRoom?.room?.capacity || s.capacity || 15;
               const enrolled = s.enrolled || 0;
-              const capacity = s.capacity || 1;
               const percentage = (enrolled / capacity) * 100;
               
               let statusText = "Disponible";
@@ -60,11 +63,11 @@ export default function MySchedulesPage() {
 
               return (
                 <tr key={s.id}>
-                  <td className="fw-bold">{daysMap[s.day_of_week] || s.day_of_week}</td>
+                  <td className="fw-bold">{daysMap ? daysMap[s.day_of_week] : s.day_of_week}</td>
                   <td>{s.start_time ? s.start_time.substring(0, 5) : ''}</td>
                   <td>{s.end_time ? s.end_time.substring(0, 5) : ''}</td>
-                  <td className="fw-bold">{s.sport_name || 'Clase'}</td>
-                  <td>{s.room_name || 'Sala'}</td>
+                  <td className="fw-bold text-primary">{sportName}</td>
+                  <td>{roomName}</td>
                   <td><Badge bg={statusBg}>{statusText}</Badge></td>
                 </tr>
               );

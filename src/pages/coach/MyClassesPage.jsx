@@ -10,6 +10,7 @@ export default function MyClassesPage() {
     try {
       const data = await getMyClasses();
       const safeData = data.data || data;
+      console.log("DATOS DEL BACKEND:", safeData);
       setClasses(Array.isArray(safeData) ? safeData : []);
     } catch (error) {
       Swal.fire('Error', 'No se pudieron cargar tus clases', 'error');
@@ -18,47 +19,61 @@ export default function MyClassesPage() {
 
   useEffect(() => { fetchClasses(); }, []);
 
-  // Matemáticas para los contadores superiores
-  const totalClasses = classes.length;
-  const totalEnrolled = classes.reduce((acc, c) => acc + (parseInt(c.enrolled || 0)), 0);
-  const totalCapacity = classes.reduce((acc, c) => acc + (parseInt(c.capacity || 0)), 0);
-  const availableSpots = totalCapacity - totalEnrolled;
+  const daysMap = {
+    '1': 'Lunes', '2': 'Martes', '3': 'Miércoles', '4': 'Jueves', 
+    '5': 'Viernes', '6': 'Sábado', '7': 'Domingo',
+    'Lunes': 'Lunes', 'Martes': 'Martes', 'Miercoles': 'Miércoles', 
+    'Jueves': 'Jueves', 'Viernes': 'Viernes', 'Sabado': 'Sábado', 'Domingo': 'Domingo'
+  };
+
+  // 🚀 EL DETECTOR UNIVERSAL: Busca los inscritos sin importar cómo los llame el backend
+  const getEnrolledCount = (obj) => {
+    if (!obj) return 0;
+    if (obj.enrolled !== undefined && obj.enrolled !== null) return parseInt(obj.enrolled);
+    if (Array.isArray(obj.reservations)) return obj.reservations.length;
+    if (obj.reservations_count !== undefined) return parseInt(obj.reservations_count);
+    if (obj._count && obj._count.reservations) return parseInt(obj._count.reservations);
+    return 0; // Si el backend definitivamente no manda nada, muestra 0
+  };
 
   return (
     <div className="container mt-4">
       <div className="mb-4">
-        <h2 style={{ color: '#00695c', fontWeight: 'bold' }}>Mis Clases</h2>
+        <h2 style={{ color: '#004d40', fontWeight: 'bold' }}>Mis Clases</h2>
         <p className="text-muted">Clases asignadas a tu cargo</p>
       </div>
 
-      <Row className="mb-4">
-        <Col md={4}>
-          <Card className="shadow-sm border-0">
-            <Card.Body>
-              <h6 className="text-muted text-uppercase mb-2">Clases a cargo</h6>
-              <h3 style={{ color: '#00897b', fontWeight: 'bold' }}>{totalClasses}</h3>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={4}>
-          <Card className="shadow-sm border-0">
-            <Card.Body>
-              <h6 className="text-muted text-uppercase mb-2">Total Inscritos</h6>
-              <h3 style={{ color: '#1e88e5', fontWeight: 'bold' }}>{totalEnrolled}</h3>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={4}>
-          <Card className="shadow-sm border-0">
-            <Card.Body>
-              <h6 className="text-muted text-uppercase mb-2">Cupos Disponibles</h6>
-              <h3 style={{ color: '#fb8c00', fontWeight: 'bold' }}>{availableSpots}</h3>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      {(() => {
+        // Usamos el detector para sumar el total general
+        const totalEnrolled = classes.reduce((sum, c) => {
+          const scheduleObj = (c.schedules && c.schedules.length > 0) ? c.schedules[0] : c;
+          return sum + getEnrolledCount(scheduleObj);
+        }, 0);
 
-      <Card className="shadow-sm border-0">
+        return (
+          <Row className="mb-4">
+            <Col md={6}>
+              <Card className="shadow-sm border-0 h-100 rounded-3">
+                <Card.Body>
+                  <h6 className="text-muted text-uppercase mb-2 fw-bold" style={{ fontSize: '12px' }}>Clases a cargo</h6>
+                  <h3 className="text-success mb-0 fw-bold">{classes.length}</h3>
+                </Card.Body>
+              </Card>
+            </Col>
+            
+            <Col md={6}>
+              <Card className="shadow-sm border-0 h-100 rounded-3">
+                <Card.Body>
+                  <h6 className="text-muted text-uppercase mb-2 fw-bold" style={{ fontSize: '12px' }}>Total Inscritos</h6>
+                  <h3 className="text-primary mb-0 fw-bold">{totalEnrolled}</h3>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        );
+      })()}
+
+      <Card className="shadow-sm border-0 rounded-3">
         <Table responsive hover className="mb-0">
           <thead className="bg-light">
             <tr>
@@ -72,30 +87,39 @@ export default function MyClassesPage() {
           </thead>
           <tbody>
             {classes.map(c => {
-              const enrolled = c.enrolled || 0;
-              const capacity = c.capacity || 1; // Para evitar que se rompa al dividir por 0
-              const percentage = (enrolled / capacity) * 100;
+              const sportName = c.sport?.name || c.sport_name || 'Clase';
+              const type = c.sport?.objective || c.objective || 'General';
+              const capacity = parseInt(c.room?.capacity || c.capacity || 15);
               
-              // Colores condicionales de la barra según si está llena o vacía
+              const scheduleObj = (c.schedules && c.schedules.length > 0) ? c.schedules[0] : c;
+              const dayOfWeek = scheduleObj.day_of_week;
+              const startTime = scheduleObj.start_time;
+              const endTime = scheduleObj.end_time;
+
+              // Usamos el detector para la barra de cada fila individual
+              const enrolled = getEnrolledCount(scheduleObj);
+              const percentage = capacity > 0 ? (enrolled / capacity) * 100 : 0;
+
               let variant = "success";
-              if (percentage > 85) variant = "danger";
-              else if (percentage > 50) variant = "warning";
+              if (percentage >= 100) variant = "danger";
+              else if (percentage > 70) variant = "warning";
 
               return (
                 <tr key={c.id}>
-                  <td className="fw-bold">{c.sport_name || 'Clase'}</td>
-                  <td><Badge bg="light" text="dark" className="border">{c.objective || 'General'}</Badge></td>
-                  <td>{c.day_of_week || 'Día'}</td>
+                  <td className="fw-bold">{sportName}</td>
+                  <td><Badge bg="light" text="dark" className="border">{type}</Badge></td>
+                  <td>{dayOfWeek ? (daysMap[dayOfWeek] || dayOfWeek) : 'Por definir'}</td>
                   <td>
-                    {c.start_time ? c.start_time.substring(0, 5) : ''} - {c.end_time ? c.end_time.substring(0, 5) : ''}
+                    {startTime ? startTime.substring(0, 5) : 'Sin horario'} 
+                    {endTime ? ` - ${endTime.substring(0, 5)}` : ''}
                   </td>
                   <td className="align-middle">
                     <div className="d-flex align-items-center gap-2">
-                      <ProgressBar variant={variant} now={percentage} style={{ width: '80px', height: '6px' }} />
-                      <span className="small text-muted">{enrolled}</span>
+                      <ProgressBar variant={variant} now={percentage > 100 ? 100 : percentage} style={{ width: '80px', height: '6px' }} />
+                      <span className="small text-muted fw-bold">{enrolled}</span>
                     </div>
                   </td>
-                  <td className="text-muted">{c.capacity || 0} personas</td>
+                  <td className="text-muted">{capacity} personas</td>
                 </tr>
               );
             })}

@@ -1,6 +1,7 @@
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../services/authService';
+import { Outlet, Link } from 'react-router-dom';
 
 export default function CoachLayout({ children }) {
   const navigate = useNavigate();
@@ -14,25 +15,26 @@ export default function CoachLayout({ children }) {
     <div className="bg-light min-vh-100">
       <Navbar style={{ backgroundColor: '#00897b' }} variant="dark" expand="lg" className="shadow-sm">
         <Container>
-          <Navbar.Brand href="/coach/classes" className="fw-bold">
+          <Navbar.Brand as={Link} to="/coach/dashboard" className="fw-bold" style={{ cursor: 'pointer' }}>
             <i className="bi bi-person-badge me-2"></i>SportClub | Coach
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link href="/coach/classes">Mis Clases</Nav.Link>
-              <Nav.Link href="/coach/schedules">Mi Horario</Nav.Link>
-            </Nav>
-            <Nav>
-              <Button variant="outline-light" size="sm" onClick={handleLogout}>
-                <i className="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
-              </Button>
-            </Nav>
+            <Nav.Link as={Link} to="/coach/profile" className="text-white border border-light rounded px-3 py-1 mx-1">Mi Perfil</Nav.Link>
+            <Nav.Link as={Link} to="/coach/classes" className="text-white border border-light rounded px-3 py-1 mx-1">Mis Clases</Nav.Link>
+            <Nav.Link as={Link} to="/coach/schedules" className="text-white border border-light rounded px-3 py-1 mx-1">Mi Horario</Nav.Link>
+          </Nav>
+          <Nav>
+            <Button variant="outline-light" size="sm" onClick={handleLogout}>
+              <i className="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
+            </Button>
+          </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
       <Container className="mt-4">
-        {children}
+        {children}<Outlet />
       </Container>
     </div>
   );

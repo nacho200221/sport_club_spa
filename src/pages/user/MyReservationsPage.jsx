@@ -34,13 +34,13 @@ export default function MyReservationsPage() {
     if (result.isConfirmed) {
       try {
         await cancelReservation(id);
+        setReservations(prev => prev.map(r => r.id === id ? { ...r, status: 'cancelled' } : r));
         Swal.fire('Cancelada', 'Tu reserva ha sido anulada', 'success');
-        fetchReservations(); // Refrescar tabla
       } catch (error) {
         Swal.fire('Error', 'No se pudo cancelar la reserva', 'error');
       }
     }
-  };
+  };;
 
   return (
     <div className="container mt-4">
@@ -63,15 +63,17 @@ export default function MyReservationsPage() {
           </thead>
           <tbody>
             {reservations.map(r => {
-              const isActive = r.status !== 'Cancelada' && r.status !== 'cancelada';
+              const isActive = r.status !== 'cancelled' && r.status !== 'Cancelada' && r.status !== 'cancelada';
               
               return (
                 <tr key={r.id}>
                   <td className="fw-bold">{r.sport_name || 'Clase'}</td>
                   <td className="text-muted">{r.coach_name || 'Coach'}</td>
-                  <td className="fw-bold">{daysMap[r.day_of_week] || r.day_of_week}</td>
-                  <td>
-                    {r.start_time ? r.start_time.substring(0, 5) : ''}
+                  <td className="fw-bold">{r.classSchedule ? daysMap[r.classSchedule.day_of_week] : 'Por definir'}
+                  </td>
+                  <td>{r.classSchedule && r.classSchedule.start_time 
+                        ? r.classSchedule.start_time.substring(0, 5) 
+                        : 'Por definir'}
                   </td>
                   <td>
                     <Badge bg={isActive ? 'success' : 'secondary'} className="px-3 py-2 rounded-pill">

@@ -110,23 +110,29 @@ export default function SchedulesPage() {
               <th className="text-muted border-0">DÍA</th>
               <th className="text-muted border-0">INICIO</th>
               <th className="text-muted border-0">FIN</th>
-              <th className="text-muted border-0">ID ASIGNACIÓN</th>
+              <th className="text-muted border-0">ASIGNACIÓN</th>
               <th className="text-muted border-0">ACCIONES</th>
             </tr>
           </thead>
           <tbody>
-            {schedules.map(s => (
-              <tr key={s.id}>
-                <td className="fw-bold">{daysMap[s.day_of_week] || s.day_of_week}</td>
-                <td>{s.start_time ? s.start_time.substring(0, 5) : ''}</td>
-                <td>{s.end_time ? s.end_time.substring(0, 5) : ''}</td>
-                <td>{s.sport_room_id}</td>
-                <td>
-                  <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleShow(s)}>Editar</Button>
-                  <Button variant="outline-danger" size="sm" onClick={() => handleDelete(s.id)}>Eliminar</Button>
-                </td>
-              </tr>
-            ))}
+            {schedules.map(s => {
+              const assignmentName = s.sportRoom?.sport?.name 
+                ? `Clase de ${s.sportRoom.sport.name}` 
+                : `Asignación N°${s.sport_room_id}`;
+
+              return (
+                <tr key={s.id}>
+                  <td className="fw-bold">{daysMap[s.day_of_week] || s.day_of_week}</td>
+                  <td>{s.start_time ? s.start_time.substring(0, 5) : ''}</td>
+                  <td>{s.end_time ? s.end_time.substring(0, 5) : ''}</td>
+                  <td className="text-primary fw-medium">{assignmentName}</td>
+                  <td>
+                    <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleShow(s)}>Editar</Button>
+                    <Button variant="outline-danger" size="sm" onClick={() => handleDelete(s.id)}>Eliminar</Button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       </Card>
@@ -150,11 +156,20 @@ export default function SchedulesPage() {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Día de la semana</Form.Label>
-              <Form.Select required value={formData.day_of_week} onChange={e => setFormData({...formData, day_of_week: e.target.value})}>
-                {Object.entries(daysMap).map(([num, name]) => (
-                  <option key={num} value={num}>{name}</option>
-                ))}
+              <Form.Label>Asignación (Deporte/Sala/Coach)</Form.Label>
+              <Form.Select required value={formData.sport_room_id} onChange={e => setFormData({...formData, sport_room_id: e.target.value})}>
+                <option value="">Selecciona la asignación base...</option>
+                {assignments.map(a => {
+                  const sportName = a.sport?.name || `Deporte ${a.sport_id}`;
+                  const roomName = a.room?.name || `Sala ${a.room_id}`;
+                  const coachEmail = a.coach?.email || 'Sin Coach Asignado';
+                  
+                  return (
+                    <option key={a.id} value={a.id}>
+                      {sportName} | {roomName} | Entrenador: {coachEmail}
+                    </option>
+                  );
+                })}
               </Form.Select>
             </Form.Group>
 

@@ -34,7 +34,7 @@ export default function AvailableClassesPage() {
       try {
         await createReservation(classScheduleId);
         Swal.fire('¡Éxito!', 'Tu reserva ha sido confirmada', 'success');
-        fetchClasses(); // Recarga para actualizar los cupos
+        fetchClasses(); 
       } catch (error) {
         Swal.fire('Error', error.message || 'No se pudo completar la reserva', 'error');
       }
@@ -55,7 +55,7 @@ export default function AvailableClassesPage() {
           <thead className="bg-light">
             <tr>
               <th className="text-muted border-0">CLASE</th>
-              <th className="text-muted border-0">TIPO</th>
+              <th className="text-muted border-0">DEPORTE</th>
               <th className="text-muted border-0">COACH</th>
               <th className="text-muted border-0">DÍA</th>
               <th className="text-muted border-0">HORARIO</th>
@@ -63,33 +63,35 @@ export default function AvailableClassesPage() {
             </tr>
           </thead>
           <tbody>
-            {classes.map(c => {
-              const enrolled = c.enrolled || 0;
-              const capacity = c.capacity || 1;
-              const isFull = enrolled >= capacity;
+            {classes
+              .filter(c => c.schedules && c.schedules.length > 0) 
+              .map(c => {
+                const enrolled = c.enrolled || 0;
+                const capacity = c.room?.capacity || 15; 
+                const isFull = enrolled >= capacity;
 
-              return (
-                <tr key={c.id}>
-                  <td className="fw-bold">{c.sport_name || 'Clase'}</td>
-                  <td><Badge bg="light" text="dark" className="border">{c.objective || 'General'}</Badge></td>
-                  <td>{c.coach_name || 'Por asignar'}</td>
-                  <td className="fw-bold">{daysMap[c.day_of_week] || c.day_of_week}</td>
-                  <td>{c.start_time ? c.start_time.substring(0, 5) : ''}</td>
-                  <td>
-                    <Button 
-                      variant={isFull ? "secondary" : "primary"} 
-                      size="sm" 
-                      style={!isFull ? { backgroundColor: '#1565c0', borderColor: '#1565c0' } : {}}
-                      disabled={isFull}
-                      onClick={() => handleReserve(c.id)}
-                    >
-                      {isFull ? 'Lleno' : 'Reservar'}
-                    </Button>
-                  </td>
-                </tr>
-              );
+                return (
+                  <tr key={c.id}>
+                    <td className="fw-bold">{c.sport?.name || 'Deporte'}</td>
+                    <td><Badge bg="light" text="dark" className="border">{c.sport?.objective || 'General'}</Badge></td>
+                    <td>{c.coach?.email || 'Por asignar'}</td>
+                    <td className="fw-bold">{daysMap[c.schedules[0].day_of_week]}</td>
+                    <td>{c.schedules[0].start_time ? c.schedules[0].start_time.substring(0, 5) : ''}</td>
+                    <td>
+                      <Button 
+                        variant={isFull ? "secondary" : "primary"} 
+                        size="sm" 
+                        style={!isFull ? { backgroundColor: '#1565c0', borderColor: '#1565c0' } : {}}
+                        disabled={isFull}
+                        onClick={() => handleReserve(c.schedules[0].id)}
+                      >
+                        {isFull ? 'Lleno' : 'Reservar'}
+                      </Button>
+                    </td>
+                  </tr>
+                );
             })}
-            {classes.length === 0 && (
+            {classes.filter(c => c.schedules && c.schedules.length > 0).length === 0 && (
               <tr><td colSpan="6" className="text-center py-4">No hay clases disponibles en este momento</td></tr>
             )}
           </tbody>
